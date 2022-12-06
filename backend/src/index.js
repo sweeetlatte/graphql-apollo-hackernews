@@ -1,4 +1,6 @@
 const { ApolloServer } = require("apollo-server");
+const fs = require("fs");
+const path = require("path");
 
 /**
  * The typeDefs constant defines your GraphQL schema.
@@ -42,11 +44,22 @@ const resolvers = {
   Query: {
     info: () => `This is the API of a Hackernews Clone`,
     feed: () => links,
+    link(parent, args, contextValue, info) {
+      return links.find((link) => link.id === args.id);
+    },
   },
-  Link: {
-    id: (parent) => parent.id,
-    description: (parent) => parent.description,
-    url: (parent) => parent.url,
+  Mutation: {
+    post: (parent, args) => {
+      let idCount = links.length;
+
+      const link = {
+        id: `link-${idCount++}`,
+        description: args.description,
+        url: args.url,
+      };
+      links.push(link);
+      return link;
+    },
   },
 };
 
