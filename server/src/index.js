@@ -1,6 +1,6 @@
 const { ApolloServer } = require("apollo-server");
 const fs = require("fs");
-const path = require("path");
+const { join } = require("path");
 
 /**
  * The typeDefs constant defines your GraphQL schema.
@@ -77,12 +77,12 @@ const resolvers = {
     updateLink: (_, args) => {
       const existingLink = links.find((link) => link.id === args.id);
 
-      if (args.url) existingLink.url = args.url;
-      if (args.description) existingLink.description = args.description;
+      args.url && (existingLink.url = args.url);
+      args.description && (existingLink.description = args.description);
 
       // await existingLink.save();
 
-      return { ...existingLink };
+      return existingLink;
     },
 
     deleteLink: (_, args) => {
@@ -100,7 +100,7 @@ const resolvers = {
  * This tells the server what API operations are accepted and how they should be resolved.
  */
 const server = new ApolloServer({
-  typeDefs: readFileSync(join(__dirname, "schema.graphql"), "utf8"),
+  typeDefs: fs.readFileSync(join(__dirname, "schema.graphql"), "utf8"),
   resolvers,
 });
 
