@@ -100,7 +100,7 @@ const resolvers = {
  * This tells the server what API operations are accepted and how they should be resolved.
  */
 const server = new ApolloServer({
-  typeDefs: fs.readFileSync(path.join(__dirname, "schema.graphql"), "utf8"),
+  typeDefs: readFileSync(join(__dirname, "schema.graphql"), "utf8"),
   resolvers,
 });
 
