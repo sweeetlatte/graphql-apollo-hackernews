@@ -12,6 +12,16 @@ let links = [
     url: "https://www.allrecipes.com/recipe/266826/air-fryer-potato-wedges/",
     description: "Air Fryer Potato Wedges",
   },
+  {
+    id: "link-1",
+    url: "https://www.allrecipes.com/recipe/8508938/loaded-chicken-and-potato-casserole/",
+    description: "Loaded Chicken and Potato Casserole",
+  },
+  {
+    id: "link-2",
+    url: "https://www.allrecipes.com/recipe/13811/watergate-salad/",
+    description: "Watergate Salad",
+  },
 ];
 
 /**
@@ -73,6 +83,14 @@ const resolvers = {
       // await existingLink.save();
 
       return { ...existingLink };
+    },
+
+    deleteLink: (_, args) => {
+      const index = links.findIndex((link) => link.id === args.id);
+
+      links.splice(index, 1);
+
+      return links;
     },
   },
 };
