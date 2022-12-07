@@ -1,28 +1,11 @@
 const { ApolloServer } = require("apollo-server");
 const fs = require("fs");
 const { join } = require("path");
+const { PrismaClient } = require("@prisma/client");
 
 /**
  * The typeDefs constant defines your GraphQL schema.
  */
-
-let links = [
-  {
-    id: "link-0",
-    url: "https://www.allrecipes.com/recipe/266826/air-fryer-potato-wedges/",
-    description: "Air Fryer Potato Wedges",
-  },
-  {
-    id: "link-1",
-    url: "https://www.allrecipes.com/recipe/8508938/loaded-chicken-and-potato-casserole/",
-    description: "Loaded Chicken and Potato Casserole",
-  },
-  {
-    id: "link-2",
-    url: "https://www.allrecipes.com/recipe/13811/watergate-salad/",
-    description: "Watergate Salad",
-  },
-];
 
 /**
  * The resolvers object is the actual implementation of the GraphQL schema.
@@ -53,47 +36,47 @@ let links = [
 const resolvers = {
   Query: {
     info: () => `This is the API of a Hackernews Clone`,
-    feed: () => links,
+    feed: async (_, __, context) => {
+      return context.prisma.link.findMany();
+    },
     link: (_, args) => {
       return links.find((link) => link.id === args.id);
     },
   },
 
   Mutation: {
-    addLink: (_, args) => {
-      let idCount = links.length;
-
-      const link = {
-        id: `link-${idCount++}`,
-        description: args.description,
-        url: args.url,
-      };
-
-      links.push(link);
-
-      return link;
+    addLink: (_, args, context, __) => {
+      const newLink = context.prisma.link.create({
+        data: {
+          url: args.url,
+          description: args.description,
+        },
+      });
+      return newLink;
     },
 
-    updateLink: (_, args) => {
-      const existingLink = links.find((link) => link.id === args.id);
+    // updateLink: (_, args) => {
+    //   const existingLink = links.find((link) => link.id === args.id);
 
-      args.url && (existingLink.url = args.url);
-      args.description && (existingLink.description = args.description);
+    //   args.url && (existingLink.url = args.url);
+    //   args.description && (existingLink.description = args.description);
 
-      // await existingLink.save();
+    //   // await existingLink.save();
 
-      return existingLink;
-    },
+    //   return existingLink;
+    // },
 
-    deleteLink: (_, args) => {
-      const index = links.findIndex((link) => link.id === args.id);
+    // deleteLink: (_, args) => {
+    //   const index = links.findIndex((link) => link.id === args.id);
 
-      links.splice(index, 1);
+    //   links.splice(index, 1);
 
-      return links;
-    },
+    //   return links;
+    // },
   },
 };
+
+const prisma = new PrismaClient();
 
 /**
  * Finally, the schema and resolvers are bundled and passed to ApolloServer.
@@ -102,6 +85,9 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs: fs.readFileSync(join(__dirname, "schema.graphql"), "utf8"),
   resolvers,
+  context: {
+    prisma,
+  },
 });
 
 server.listen().then(({ url }) => console.log(`Server is running on ${url}`));
