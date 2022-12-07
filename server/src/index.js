@@ -20,7 +20,7 @@ let links = [
  */
 
 /**
- * Every GraphQL resolver function actually receives four input arguments.
+ * Every GraphQL resolver function actually receives four input arguments: parent, args, contextValue, info
  * The first argument, commonly called parent (or sometimes root) is the result of the previous resolver execution level.
  *
  * The query:
@@ -44,13 +44,13 @@ const resolvers = {
   Query: {
     info: () => `This is the API of a Hackernews Clone`,
     feed: () => links,
-    link: (parent, args) => {
+    link: (_, args) => {
       return links.find((link) => link.id === args.id);
     },
   },
 
   Mutation: {
-    post: (parent, args) => {
+    addLink: (_, args) => {
       let idCount = links.length;
 
       const link = {
@@ -58,8 +58,21 @@ const resolvers = {
         description: args.description,
         url: args.url,
       };
+
       links.push(link);
+
       return link;
+    },
+
+    updateLink: (_, args) => {
+      const existingLink = links.find((link) => link.id === args.id);
+
+      if (args.url) existingLink.url = args.url;
+      if (args.description) existingLink.description = args.description;
+
+      // await existingLink.save();
+
+      return { ...existingLink };
     },
   },
 };
