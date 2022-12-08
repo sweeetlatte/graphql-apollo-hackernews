@@ -24,9 +24,10 @@ async function signup(parent, args, context, info) {
 async function login(parent, args, context, info) {
   // 1. use PrismaClient instance to retrieve an existing User record by the email address that was sent along as an argument in the login mutation
   //    If no User with that email address was found => return a corresponding error
-  const user = await context.prisma.user.findUnique({ where: { email: args.email } });
-  console.log(user);
-  
+  const user = await context.prisma.user.findUnique({
+    where: { email: args.email },
+  });
+
   // const user = await context.prisma.user.findUnique({
   //   where: { email: args.email },
   // });
@@ -53,13 +54,22 @@ async function login(parent, args, context, info) {
 async function addLink(parent, args, context, info) {
   const { userId } = context;
 
-  return await context.prisma.link.create({
+  let postedBy = undefined;
+  if (userId) {
+    postedBy = { connect: { id: userId } };
+  }
+
+  const newLink = await context.prisma.link.create({
     data: {
       url: args.url,
       description: args.description,
-      postedBy: { connect: { id: userId } },
+      postedBy,
     },
   });
+
+  context.pubsub.publish("NEW_LINK", newLink);
+
+  return newLink;
 }
 
 // updateLink: (_, args) => {
