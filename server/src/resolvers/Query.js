@@ -8,7 +8,11 @@ async function feed(parent, args, context) {
       }
     : {};
 
-  const links = await context.prisma.link.findMany({ where });
+  const links = await context.prisma.link.findMany({
+    where,
+    skip: args.skip,
+    take: args.take,
+  });
 
   return links;
 }
