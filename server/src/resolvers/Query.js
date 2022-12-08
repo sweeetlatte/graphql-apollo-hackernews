@@ -15,7 +15,12 @@ async function feed(parent, args, context) {
     orderBy: args.orderBy,
   });
 
-  return links;
+  const count = await context.prisma.link.count({ where });
+
+  return {
+    links,
+    count,
+  };
 }
 
 module.exports = {
