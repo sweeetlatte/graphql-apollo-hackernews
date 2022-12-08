@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { APP_SECRET, getUserId } = require("../utils");
+const { APP_SECRET } = require("../utils");
 
 async function signup(parent, args, context, info) {
   // 1. encrypt the User’s password using the bcryptjs library
@@ -24,9 +24,13 @@ async function signup(parent, args, context, info) {
 async function login(parent, args, context, info) {
   // 1. use PrismaClient instance to retrieve an existing User record by the email address that was sent along as an argument in the login mutation
   //    If no User with that email address was found => return a corresponding error
-  const user = await context.prisma.user.findUnique({
-    where: { email: args.email },
-  });
+  const user = await context.prisma.user.findUnique({ where: { email: args.email } });
+  console.log(user);
+  
+  // const user = await context.prisma.user.findUnique({
+  //   where: { email: args.email },
+  // });
+
   if (!user) {
     throw new Error("No such user found");
   }
@@ -46,8 +50,33 @@ async function login(parent, args, context, info) {
   };
 }
 
+async function addLink(parent, args, context, info) {
+  const { userId } = context;
+
+  return await context.prisma.link.create({
+    data: {
+      url: args.url,
+      description: args.description,
+      postedBy: { connect: { id: userId } },
+    },
+  });
+}
+
+// updateLink: (_, args) => {
+//   const existingLink = links.find((link) => link.id === args.id);
+//   args.url && (existingLink.url = args.url);
+//   args.description && (existingLink.description = args.description);
+//   // await existingLink.save();
+//   return existingLink;
+// },
+// deleteLink: (_, args) => {
+//   const index = links.findIndex((link) => link.id === args.id);
+//   links.splice(index, 1);
+//   return links;
+// },
+
 module.exports = {
   signup,
   login,
-  post,
+  addLink,
 };

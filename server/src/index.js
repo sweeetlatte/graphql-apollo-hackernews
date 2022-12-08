@@ -2,7 +2,12 @@ const { ApolloServer } = require("apollo-server");
 const fs = require("fs");
 const { join } = require("path");
 const { PrismaClient } = require("@prisma/client");
+
 const { getUserId } = require("./utils");
+const Query = require("./resolvers/Query");
+const Mutation = require("./resolvers/Mutation");
+const User = require("./resolvers/User");
+const Link = require("./resolvers/Link");
 
 /**
  * The typeDefs constant defines your GraphQL schema.
@@ -34,50 +39,14 @@ const { getUserId } = require("./utils");
  *
  * Therefore, in all of the three Link resolvers, the incoming parent object is the element inside the links list.
  */
-const resolvers = {
-  Query: {
-    info: () => `This is the API of a Hackernews Clone`,
-    feed: async (_, __, context) => {
-      return context.prisma.link.findMany();
-    },
-    link: (_, args) => {
-      return links.find((link) => link.id === args.id);
-    },
-  },
-
-  Mutation: {
-    addLink: (_, args, context, __) => {
-      const newLink = context.prisma.link.create({
-        data: {
-          url: args.url,
-          description: args.description,
-        },
-      });
-      return newLink;
-    },
-
-    // updateLink: (_, args) => {
-    //   const existingLink = links.find((link) => link.id === args.id);
-
-    //   args.url && (existingLink.url = args.url);
-    //   args.description && (existingLink.description = args.description);
-
-    //   // await existingLink.save();
-
-    //   return existingLink;
-    // },
-
-    // deleteLink: (_, args) => {
-    //   const index = links.findIndex((link) => link.id === args.id);
-
-    //   links.splice(index, 1);
-
-    //   return links;
-    // },
-  },
-};
-
 const prisma = new PrismaClient();
+
+const resolvers = {
+  Query,
+  Mutation,
+  User,
+  Link,
+};
 
 /**
  * Finally, the schema and resolvers are bundled and passed to ApolloServer.
@@ -88,7 +57,7 @@ const server = new ApolloServer({
   resolvers,
   // Instead of attaching an object directly, you’re now creating the context as a function which returns the context
   // The advantage of this approach is that you can attach the HTTP request that carries the incoming GraphQL query (or mutation) to the context as well
-  // This will allow your resolvers to read the Authorization header 
+  // This will allow your resolvers to read the Authorization header
   // and validate if the user who submitted the request is eligible to perform the requested operation
   context: ({ req }) => {
     return {
