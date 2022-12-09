@@ -46,6 +46,33 @@ const NEW_LINKS_SUBSCRIPTION = gql`
   }
 `;
 
+const NEW_VOTES_SUBSCRIPTION = gql`
+  subscription {
+    newVote {
+      id
+      link {
+        id
+        url
+        description
+        createdAt
+        postedBy {
+          id
+          name
+        }
+        votes {
+          id
+          user {
+            id
+          }
+        }
+      }
+      user {
+        id
+      }
+    }
+  }
+`;
+
 const LinkList = () => {
   const { data, loading, error, subscribeToMore } = useQuery(FEED_QUERY);
 
@@ -65,6 +92,10 @@ const LinkList = () => {
         },
       });
     },
+  });
+
+  subscribeToMore({
+    document: NEW_VOTES_SUBSCRIPTION,
   });
 
   return (
