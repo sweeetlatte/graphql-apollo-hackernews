@@ -1,9 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./styles/index.css";
-import App from "./components/App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
+import { setContext } from "@apollo/client/link/context";
+import { AUTH_TOKEN } from "./constants";
+import App from "./components/App";
+import "./styles/index.css";
 
 import {
   ApolloProvider,
@@ -16,8 +18,18 @@ const httpLink = createHttpLink({
   uri: "http://localhost:4000", // The GraphQL server will be running on http://localhost:4000
 });
 
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem(AUTH_TOKEN);
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : "",
+    },
+  };
+});
+
 const client = new ApolloClient({
-  link: httpLink,
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
 
