@@ -9,7 +9,7 @@ import Link from "./Link";
  * The most common way of making queries with Apollo Client is to use the useQuery hook
  * All we need to do is pass a GraphQL query document in
  *
- * Line 107
+ * Line 119
  *
  * useQuery return 3 items:
  * - loading: Is true as long as the request is still ongoing and the response hasn’t been received.
@@ -146,7 +146,7 @@ const LinkList = () => {
     <>
       {loading && <p>Loading...</p>}
       {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-      
+
       {/* Note 3:
           When the LinkList component initially renders, there won’t be any information on the data variable
           So we need to check that data is truthy before trying to render any of the links */}
