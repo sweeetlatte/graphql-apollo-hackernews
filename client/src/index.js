@@ -57,6 +57,10 @@ const client = new ApolloClient({
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
+  /**
+   * Note 6:
+   * Need to wrap the App with BrowserRouter so that all child components of App will get access to the routing functionality
+   */
   <BrowserRouter>
     <ApolloProvider client={client}>
       <React.StrictMode>

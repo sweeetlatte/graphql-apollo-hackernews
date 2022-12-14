@@ -68,6 +68,10 @@ const CreateLink = () => {
         },
       });
     },
+    /**
+     * Note 7:
+     * Implement an automatic redirect after a mutation is performed using the onCompleted function
+     */
     onCompleted: () => navigate("/"),
   });
 
