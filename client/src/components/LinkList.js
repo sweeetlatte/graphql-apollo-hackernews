@@ -4,6 +4,23 @@ import { useQuery, gql } from "@apollo/client";
 import { LINKS_PER_PAGE } from "../constants";
 import Link from "./Link";
 
+/**
+ * Note 1:
+ * The most common way of making queries with Apollo Client is to use the useQuery hook
+ * All we need to do is pass a GraphQL query document in
+ *
+ * Line 107
+ *
+ * useQuery return 3 items:
+ * - loading: Is true as long as the request is still ongoing and the response hasn’t been received.
+ * - error: In case the request fails, this field will contain information about what exactly went wrong.
+ * - data: This is the actual data that was received from the server. It has the links property which represents a list of Link elements.
+ */
+
+/**
+ * Note 2:
+ * gql parse the GraphQL query document
+ */
 export const FEED_QUERY = gql`
   query FeedQuery($take: Int, $skip: Int, $orderBy: LinkOrderByInput) {
     feed(take: $take, skip: $skip, orderBy: $orderBy) {
@@ -129,6 +146,10 @@ const LinkList = () => {
     <>
       {loading && <p>Loading...</p>}
       {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
+      
+      {/* Note 3:
+          When the LinkList component initially renders, there won’t be any information on the data variable
+          So we need to check that data is truthy before trying to render any of the links */}
       {data && (
         <>
           {getLinksToRender(isNewPage, data).map((link, index) => (
